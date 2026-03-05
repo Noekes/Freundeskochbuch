@@ -222,6 +222,44 @@
     margin-bottom: 0.4rem; font-weight: 600;
   }
 
+  /* ── SUCHLEISTE ── */
+  .search-bar {
+    margin-bottom: 1rem;
+    position: relative;
+  }
+  .search-input {
+    width: 100%; box-sizing: border-box;
+    padding: 0.65rem 2.5rem 0.65rem 2.4rem;
+    border: 1px solid var(--green-border);
+    border-radius: 999px;
+    font-size: 0.9rem; font-family: inherit;
+    background: white; color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .search-input:focus {
+    border-color: var(--green-main);
+    box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+  }
+  .search-icon {
+    position: absolute; left: 0.9rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem; pointer-events: none;
+  }
+  .search-clear {
+    position: absolute; right: 0.85rem; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: var(--text-light); font-size: 1rem;
+    display: none; padding: 0; line-height: 1;
+  }
+  .search-clear:hover { color: var(--text); }
+  .no-results {
+    text-align: center; padding: 2rem;
+    color: var(--text-light); font-size: 0.95rem;
+    display: none;
+  }
+
   /* ── FILTER-LEISTE ── */
   .filter-bar {
     display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
@@ -1758,34 +1796,76 @@ allTags.forEach(tag => {
 });
 
 function applyFilter() {
+  const isFiltering = activeFilter || searchQuery;
+  let totalVisible = 0;
+
   document.querySelectorAll('.chapter-heading').forEach(heading => {
-    // Kapitel aufklappen wenn gefiltert wird
-    if (activeFilter) {
-      heading.classList.remove('chapter-collapsed');
-    }
+    if (isFiltering) heading.classList.remove('chapter-collapsed');
     let hasVisible = false;
     let next = heading.nextElementSibling;
     while (next && !next.classList.contains('chapter-heading')) {
       if (next.tagName === 'ARTICLE' && next.classList.contains('recipe')) {
-        if (!activeFilter) {
-          next.style.display = '';
+        // Tag-Filter prüfen
+        const tagMatch = !activeFilter ||
+          Array.from(next.querySelectorAll('.tag')).map(t => t.textContent.trim()).includes(activeFilter);
+        // Suche prüfen (Titel + Zutaten + Tags)
+        const searchMatch = !searchQuery ||
+          (next.textContent || '').toLowerCase().includes(searchQuery);
+
+        const visible = tagMatch && searchMatch;
+        next.style.display = visible ? '' : 'none';
+        if (visible) {
           hasVisible = true;
-        } else {
-          const tags = Array.from(next.querySelectorAll('.tag')).map(t => t.textContent.trim());
-          const match = tags.includes(activeFilter);
-          next.style.display = match ? '' : 'none';
-          if (match) { hasVisible = true; next.classList.add('open'); }
+          totalVisible++;
+          if (isFiltering) next.classList.add('open');
         }
       }
       next = next.nextElementSibling;
     }
-    heading.style.display = hasVisible || !activeFilter ? '' : 'none';
+    heading.style.display = hasVisible || !isFiltering ? '' : 'none';
   });
+
+  // "Keine Ergebnisse"-Hinweis
+  const noResults = document.getElementById('no-results');
+  if (noResults) noResults.style.display = isFiltering && totalVisible === 0 ? 'block' : 'none';
 }
 
-// Filter-Leiste vor dem TOC einsetzen
+// Suchleiste bauen
+let searchQuery = '';
+const searchBar = document.createElement('div');
+searchBar.className = 'search-bar';
+searchBar.innerHTML = `
+  <span class="search-icon">🔍</span>
+  <input class="search-input" type="text" placeholder="Rezept oder Zutat suchen … (z.B. Lasagne, Tomaten, Ingwer)">
+  <button class="search-clear">✕</button>
+`;
+const searchInput = searchBar.querySelector('.search-input');
+const searchClearBtn = searchBar.querySelector('.search-clear');
+
+searchInput.addEventListener('input', () => {
+  searchQuery = searchInput.value.trim().toLowerCase();
+  searchClearBtn.style.display = searchQuery ? 'block' : 'none';
+  applyFilter();
+});
+searchClearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  searchQuery = '';
+  searchClearBtn.style.display = 'none';
+  applyFilter();
+  searchInput.focus();
+});
+
+// "Keine Ergebnisse"-Hinweis
+const noResults = document.createElement('p');
+noResults.id = 'no-results';
+noResults.className = 'no-results';
+noResults.textContent = '😕 Kein Rezept gefunden – versuch einen anderen Suchbegriff.';
+
+// Alles vor dem TOC einsetzen
 const tocEl = document.querySelector('.toc');
+tocEl.parentNode.insertBefore(searchBar, tocEl);
 tocEl.parentNode.insertBefore(filterBar, tocEl);
+tocEl.parentNode.insertBefore(noResults, tocEl);
 
 // ── FORMSPREE AJAX-SUBMIT ──
 const rezeptForm = document.getElementById('rezeptForm');
