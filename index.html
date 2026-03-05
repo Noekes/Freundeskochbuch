@@ -1582,7 +1582,7 @@
   <div class="rezept-form-section" id="rezeptidee">
     <div class="rezept-form-header">
       <h2>💡 Rezeptidee einreichen</h2>
-      <p>Hast du ein Lieblingsrezept? Schick es rein – wir bauen es ins Kochbuch ein!</p>
+      <p>Hast du ein Lieblingsrezept? Reicht ein Name, ein Link oder eine grobe Idee – wir kümmern uns um den Rest!</p>
     </div>
     <form class="rezept-form-body" id="rezeptForm" action="https://formspree.io/f/mreyzoon" method="POST">
       <div class="form-row">
@@ -1596,7 +1596,11 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="kategorie">Kategorie</label>
+        <label for="link">Link zum Rezept <span style="font-weight:400; color:#9CA3AF;">(optional)</span></label>
+        <input type="url" id="link" name="link" placeholder="z.B. https://www.chefkoch.de/rezepte/...">
+      </div>
+      <div class="form-group">
+        <label for="kategorie">Kategorie <span style="font-weight:400; color:#9CA3AF;">(optional)</span></label>
         <select id="kategorie" name="kategorie">
           <option value="">-- bitte wählen --</option>
           <option>Frühstück</option>
@@ -1611,12 +1615,12 @@
         </select>
       </div>
       <div class="form-group">
-        <label for="zutaten">Zutaten</label>
-        <textarea id="zutaten" name="zutaten" placeholder="z.B. 200g Linsen, 1 Zwiebel, Knoblauch ..."></textarea>
+        <label for="zutaten">Zutaten <span style="font-weight:400; color:#9CA3AF;">(optional – grob reicht!)</span></label>
+        <textarea id="zutaten" name="zutaten" placeholder="Kein Stress mit genauen Mengen – z.B. einfach: Kichererbsen, Tomaten, Gewürze"></textarea>
       </div>
       <div class="form-group">
-        <label for="zubereitung">Zubereitung / Idee</label>
-        <textarea id="zubereitung" name="zubereitung" placeholder="Kurze Beschreibung, wie das Gericht gemacht wird ..."></textarea>
+        <label for="zubereitung">Beschreibung / Idee <span style="font-weight:400; color:#9CA3AF;">(optional)</span></label>
+        <textarea id="zubereitung" name="zubereitung" placeholder="Ein paar Stichworte reichen – z.B. &quot;wird im Ofen gemacht, super einfach, schmeckt wie bei Oma&quot;"></textarea>
       </div>
       <button type="submit" class="btn-submit">📨 Rezeptidee einschicken</button>
     </form>
