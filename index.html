@@ -1720,6 +1720,22 @@ document.querySelectorAll('article.recipe').forEach(recipe => {
   });
 });
 
+// ── INHALTSVERZEICHNIS EINKLAPPBAR ──
+const tocHeading = document.querySelector('.toc > h2');
+const tocContentDiv = document.getElementById('toc-content');
+if (tocHeading && tocContentDiv) {
+  const tocChevron = document.createElement('span');
+  tocChevron.textContent = '▼';
+  tocChevron.style.cssText = 'margin-left:auto; font-size:0.75rem; display:inline-block; transition:transform 0.3s; color:var(--green-main);';
+  tocHeading.style.cssText += 'display:flex; align-items:center; cursor:pointer; user-select:none;';
+  tocHeading.appendChild(tocChevron);
+  tocHeading.addEventListener('click', () => {
+    const isOpen = tocContentDiv.style.display !== 'none';
+    tocContentDiv.style.display = isOpen ? 'none' : '';
+    tocChevron.style.transform = isOpen ? 'rotate(-90deg)' : '';
+  });
+}
+
 // TOC-Links klicken öffnet das Rezept gleich mit
 document.querySelectorAll('.toc-list a').forEach(link => {
   link.addEventListener('click', () => {
