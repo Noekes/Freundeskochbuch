@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freundeskochbuch</title>
+<style>
+  :root {
+    --green-dark:   #1B4332;
+    --green-main:   #2D6A4F;
+    --green-mid:    #40916C;
+    --green-light:  #D8F3DC;
+    --green-border: #B7E4C7;
+    --text:         #374151;
+    --text-light:   #6B7280;
+    --white:        #ffffff;
+    --bg:           #f9fafb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-main) 100%);
+    color: white;
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+  }
+  .site-header .leaf { font-size: 2.5rem; }
+  .site-header h1 { font-size: 2.2rem; margin: 0.4rem 0 0.2rem; }
+  .site-header .subtitle {
+    font-size: 0.95rem; letter-spacing: 0.12em;
+    opacity: 0.8; text-transform: uppercase;
+  }
+  .site-header p { margin-top: 1rem; opacity: 0.85; max-width: 540px; margin-inline: auto; }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--green-main);
+    padding: 0.6rem 1rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    justify-content: center;
+    position: sticky; top: 0; z-index: 100;
+  }
+  nav a {
+    color: white; text-decoration: none;
+    padding: 0.3rem 0.8rem; border-radius: 999px;
+    font-size: 0.85rem; transition: background .2s;
+  }
+  nav a:hover { background: rgba(255,255,255,0.2); }
+
+  /* ── MAIN ── */
+  main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* ── CHAPTER HEADING ── */
+  .chapter-heading {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-size: 1.5rem; font-weight: 700;
+    color: var(--green-dark);
+    margin: 3rem 0 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--green-border);
+  }
+  .chapter-heading:first-child { margin-top: 0; }
+
+  /* ── RECIPE CARD ── */
+  .recipe {
+    background: white;
+    border: 1px solid var(--green-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .recipe-header {
+    background: var(--green-light);
+    padding: 1rem 1.4rem 0.8rem;
+    border-bottom: 1px solid var(--green-border);
+  }
+  .recipe-header h2 { color: var(--green-dark); font-size: 1.2rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+  .tag {
+    background: white; color: var(--green-main);
+    border: 1px solid var(--green-border);
+    border-radius: 999px; font-size: 0.75rem;
+    padding: 0.15rem 0.6rem;
+  }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 1.5rem;
+    padding: 0.8rem 1.4rem;
+    background: #f8fffe;
+    border-bottom: 1px solid var(--green-border);
+    font-size: 0.85rem; color: var(--text-light);
+  }
+  .meta span strong { color: var(--text); }
+
+  .recipe-body {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 0;
+  }
+  @media (max-width: 600px) { .recipe-body { grid-template-columns: 1fr; } }
+
+  .ingredients {
+    padding: 1.2rem 1.4rem;
+    border-right: 1px solid var(--green-border);
+    background: var(--green-light);
+  }
+  @media (max-width: 600px) {
+    .ingredients { border-right: none; border-bottom: 1px solid var(--green-border); }
+  }
+  .ingredients h3, .steps h3 {
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--green-main);
+    margin-bottom: 0.7rem;
+  }
+  .ingredients ul { list-style: none; }
+  .ingredients ul li {
+    padding: 0.2rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px dashed var(--green-border);
+  }
+  .ingredients ul li:last-child { border-bottom: none; }
+  .ing-amount { font-weight: 600; color: var(--green-dark); min-width: 3.5rem; display: inline-block; }
+
+  .steps { padding: 1.2rem 1.4rem; }
+  .steps ol { padding-left: 1.2rem; }
+  .steps ol li { padding: 0.3rem 0; font-size: 0.9rem; }
+
+  .tip {
+    margin: 0.8rem 1.4rem 1.2rem;
+    padding: 0.6rem 0.9rem;
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.85rem; color: #92400e;
+  }
+
+  /* ── BROTZEIT GRID ── */
+  .brotzeit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  @media (max-width: 580px) { .brotzeit-grid { grid-template-columns: 1fr; } }
+
+  .brotzeit-card {
+    background: white;
+    border: 1px solid var(--green-border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .brotzeit-card h3 {
+    color: var(--green-dark); font-size: 1rem;
+    margin-bottom: 0.55rem;
+  }
+  .brotzeit-card ul { list-style: disc; padding-left: 1.1rem; }
+  .brotzeit-card ul li { font-size: 0.88rem; padding: 0.15rem 0; color: var(--text); }
+
+  /* ── SHOPPING LIST ── */
+  .shopping-list {
+    background: white;
+    border: 1px solid var(--green-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 1.8rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .shopping-list-header {
+    background: var(--green-main);
+    color: white;
+    padding: 0.8rem 1.2rem;
+    font-size: 1.1rem; font-weight: 700;
+  }
+  .shopping-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    border-bottom: 1px solid var(--green-border);
+  }
+  .shopping-row:last-child { border-bottom: none; }
+  .shopping-cat {
+    background: var(--green-light);
+    padding: 0.6rem 0.9rem;
+    font-weight: 600; font-size: 0.85rem;
+    color: var(--green-dark);
+    border-right: 1px solid var(--green-border);
+    display: flex; align-items: center;
+  }
+  .shopping-items {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.88rem; color: var(--text);
+  }
+  .shopping-note {
+    font-size: 0.8rem; color: var(--text-light);
+    font-style: italic; padding: 0.6rem 1.2rem;
+    border-top: 1px solid var(--green-border);
+    background: #fafff9;
+  }
+  @media (max-width: 500px) {
+    .shopping-row { grid-template-columns: 1fr; }
+    .shopping-cat { border-right: none; border-bottom: 1px solid var(--green-border); }
+  }
+
+  /* ── BECHAMEL SECTION ── */
+  .subsection {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px dashed var(--green-border);
+  }
+  .subsection-label {
+    font-size: 0.75rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--green-main);
+    margin-bottom: 0.4rem; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="leaf">🍃</div>
+  <h1>Freundeskochbuch</h1>
+  <p class="subtitle">Modern · Gesund · Vegetarisch</p>
+  <p>Gerichte die wir lieben – einfach, alltagstauglich und lecker.</p>
+</header>
+
+<!-- NAV -->
+<nav>
+  <a href="#fruehstueck">🥣 Frühstück</a>
+  <a href="#salate">🥗 Salate &amp; Bowls</a>
+  <a href="#pasta">🍝 Pasta &amp; Getreide</a>
+  <a href="#burger">🍔 Burger &amp; Snacks</a>
+  <a href="#ofen">🥘 Ofengerichte</a>
+  <a href="#suppen">🫘 Suppen</a>
+  <a href="#suesses">🍰 Süßes</a>
+  <a href="#brotzeit">🍞 Brotzeit</a>
+</nav>
+
+<main>
+
+  <!-- ════════════════════════════════════════════
+       SALATE & BOWLS
+  ════════════════════════════════════════════ -->
+  <h2 class="chapter-heading" id="salate">🥗 Salate &amp; Bowls</h2>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🥗 Bunter Quinoa-Bowl mit Tahini-Dressing</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegan</span>
+        <span class="tag">⚡ Schnell</span>
+        <span class="tag">💪 Proteinreich</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>25 Min.</strong></span>
+      <span>🍽 <strong>2 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">150 g</span> Quinoa</li>
+          <li><span class="ing-amount">1 Dose</span> Kichererbsen, abgetropft</li>
+          <li><span class="ing-amount">2</span> Karotten, geraspelt</li>
+          <li><span class="ing-amount">1</span> Avocado, gewürfelt</li>
+          <li><span class="ing-amount">100 g</span> Rucola oder Spinat</li>
+          <li><span class="ing-amount">2 EL</span> Tahini</li>
+          <li><span class="ing-amount">1</span> Zitrone, Saft</li>
+          <li><span class="ing-amount">1 TL</span> Ahornsirup</li>
+          <li><span class="ing-amount"></span> Salz, Pfeffer, Sesam</li>
+        </ul>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Quinoa nach Packungsanweisung kochen (~15 Min.), dann abkühlen lassen.</li>
+          <li>Kichererbsen mit Olivenöl, Paprikapulver und Salz in der Pfanne 5 Min. knusprig rösten.</li>
+          <li>Tahini, Zitronensaft, Ahornsirup und 2–3 EL Wasser zu einem glatten Dressing verrühren.</li>
+          <li>Alle Zutaten in Schüsseln anrichten, Dressing darüber – fertig!</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Quinoa am Vortag kochen – spart Zeit und schmeckt kalt genauso gut.</div>
+  </article>
+
+  <!-- ════════════════════════════════════════════
+       FRÜHSTÜCK
+  ════════════════════════════════════════════ -->
+  <h2 class="chapter-heading" id="fruehstueck">🥣 Frühstück &amp; Brunch</h2>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🍓 Joghurt-Bowl mit Himbeeren &amp; Chia</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">⚡ Schnell</span>
+        <span class="tag">💪 Proteinreich</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>5 Min.</strong></span>
+      <span>🍽 <strong>1 Person</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">150 g</span> Quark (Mager- oder Sahnequark)</li>
+          <li><span class="ing-amount">100 g</span> griechischer Joghurt</li>
+          <li><span class="ing-amount">100 g</span> gefrorene Himbeeren</li>
+          <li><span class="ing-amount">1–2 EL</span> Chia-Samen</li>
+          <li><span class="ing-amount"></span> Optional: Honig oder Ahornsirup</li>
+          <li><span class="ing-amount"></span> Optional: Granola, Nüsse, Kokosflocken</li>
+        </ul>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Quark und Joghurt glatt verrühren – wer es cremiger mag, etwas Milch dazugeben.</li>
+          <li>Gefrorene Himbeeren direkt auf die Quark-Joghurt-Masse geben – sie tauen schnell auf und kühlen die Bowl angenehm.</li>
+          <li>Chia-Samen darüberstreuen.</li>
+          <li>Nach Belieben mit Honig süßen und mit Granola oder Nüssen toppen.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Abends vorbereiten und über Nacht im Kühlschrank stehen lassen – die Chia-Samen quellen auf und machen daraus ein perfektes Overnight-Frühstück. Die Himbeeren dann erst morgens drauf.</div>
+  </article>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🥞 Dünne Pfannkuchen (Crêpes)</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">❤️ Familienklassiker</span>
+        <span class="tag">⚡ Schnell</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>20 Min.</strong></span>
+      <span>🍽 <strong>2 Personen (~8 Stück)</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">100 g</span> Mehl</li>
+          <li><span class="ing-amount">2</span> Eier</li>
+          <li><span class="ing-amount">300 ml</span> Milch (viel → flüssiger Teig!)</li>
+          <li><span class="ing-amount">1 EL</span> Butter, zerlassen</li>
+          <li><span class="ing-amount">1 Prise</span> Salz</li>
+          <li><span class="ing-amount"></span> Butter zum Braten</li>
+        </ul>
+        <div class="subsection">
+          <div class="subsection-label">— Toppings (Auswahl) —</div>
+          <ul>
+            <li><span class="ing-amount"></span> Zucker &amp; Zimt</li>
+            <li><span class="ing-amount"></span> Apfelmus</li>
+            <li><span class="ing-amount"></span> Haselnusscreme (z.B. Viba)</li>
+            <li><span class="ing-amount"></span> Bananenscheiben</li>
+            <li><span class="ing-amount"></span> Apfelscheiben, kurz in Butter geschwenkt</li>
+            <li><span class="ing-amount"></span> Ahornsirup oder Honig</li>
+          </ul>
+        </div>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Mehl, Eier, Milch, zerlassene Butter und Salz zu einem sehr flüssigen, klümpchenfreien Teig verrühren – er soll wirklich dünn fließen.</li>
+          <li>Optional: 15 Min. ruhen lassen, dann werden die Crêpes noch zarter.</li>
+          <li>Pfanne bei mittlerer-hoher Hitze erhitzen, etwas Butter hineingeben.</li>
+          <li>Eine kleine Kelle Teig in die Pfanne geben und sofort schwenken bis der Boden dünn bedeckt ist.</li>
+          <li>1–2 Min. braten bis die Ränder sich lösen und die Unterseite leicht goldbraun ist, dann wenden und noch 30 Sek. fertig backen.</li>
+          <li>Mit Lieblingstopping servieren – einfach rollen oder falten.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Der erste Pfannkuchen ist immer der schlechteste – einfach selbst essen als Kocherprivileg! Apfelscheiben kurz mit etwas Butter und Zimt in der Pfanne anbraten bevor du sie drauflegst – macht einen riesigen Unterschied.</div>
+  </article>
+
+  <!-- ════════════════════════════════════════════
+       PASTA & GETREIDE
+  ════════════════════════════════════════════ -->
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🍝 Mediterraner Nudelsalat</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">☀️ Sommerlich</span>
+        <span class="tag">🥗 Meal Prep</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>25 Min. + Kühlzeit</strong></span>
+      <span>🍽 <strong>3–4 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">300 g</span> Penne oder Farfalle</li>
+          <li><span class="ing-amount">3 EL</span> Tomatenmark</li>
+          <li><span class="ing-amount">4 EL</span> Olivenöl (gutes!)</li>
+          <li><span class="ing-amount">2</span> Knoblauchzehen, gepresst</li>
+          <li><span class="ing-amount">1 EL</span> Balsamico oder Zitronensaft</li>
+          <li><span class="ing-amount">150 g</span> Feta, gewürfelt</li>
+          <li><span class="ing-amount">80 g</span> getrocknete Tomaten, in Streifen</li>
+          <li><span class="ing-amount">50 g</span> Kapern oder schwarze Oliven</li>
+          <li><span class="ing-amount">50 g</span> Rucola</li>
+          <li><span class="ing-amount"></span> Salz &amp; Pfeffer</li>
+          <li><span class="ing-amount"></span> Optional: rote Zwiebel, Pinienkerne, frisches Basilikum</li>
+        </ul>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Pasta nach Packungsanweisung kochen, abgießen und kalt abschrecken – sie soll wirklich abkühlen.</li>
+          <li>Tomatenmark mit Olivenöl, Knoblauch, Balsamico, Salz und Pfeffer zu einem Dressing verrühren.</li>
+          <li>Pasta mit dem Dressing gründlich vermischen.</li>
+          <li>Getrocknete Tomaten, Kapern bzw. Oliven und Feta unterheben.</li>
+          <li>Rucola erst kurz vor dem Servieren untermischen – so bleibt er frisch.</li>
+          <li>Abschmecken und mindestens 20 Min. im Kühlschrank ziehen lassen.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Am nächsten Tag noch besser – perfekt zum Vorbereiten. Den Rucola immer erst beim Servieren dazugeben.</div>
+  </article>
+  <h2 class="chapter-heading" id="pasta">🍝 Pasta &amp; Getreide</h2>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🍝 Cremige Tomaten-Linsen-Pasta</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">🏠 Hausmannskost</span>
+        <span class="tag">❤️ Familienklassiker</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>30 Min.</strong></span>
+      <span>🍽 <strong>4 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">400 g</span> Pasta (z.B. Rigatoni)</li>
+          <li><span class="ing-amount">150 g</span> rote Linsen</li>
+          <li><span class="ing-amount">1 Dose</span> gehackte Tomaten (400 g)</li>
+          <li><span class="ing-amount">1</span> Zwiebel, fein gewürfelt</li>
+          <li><span class="ing-amount">3</span> Knoblauchzehen</li>
+          <li><span class="ing-amount">100 ml</span> Kokosmilch oder Sahne</li>
+          <li><span class="ing-amount">1 TL</span> Kreuzkümmel</li>
+          <li><span class="ing-amount">1 TL</span> Paprikapulver (geräuchert)</li>
+          <li><span class="ing-amount"></span> Olivenöl, Salz, Pfeffer, Basilikum</li>
+        </ul>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Zwiebel und Knoblauch in Olivenöl weich dünsten (3–4 Min.).</li>
+          <li>Linsen, Tomaten und Gewürze dazugeben, 200 ml Wasser hinzufügen – 15 Min. köcheln lassen.</li>
+          <li>Pasta nach Packungsanweisung al dente kochen.</li>
+          <li>Kokosmilch unter die Sauce rühren, abschmecken, mit Pasta servieren.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Mit einem Spritzer Zitrone und Chili-Flocken abschmecken – macht die Sauce noch lebendiger.</div>
+  </article>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🫕 Vegetarische Lasagne mit Hackfleischersatz</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">🏠 Hausmannskost</span>
+        <span class="tag">👨‍👩‍👧 Familienklassiker</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>75 Min.</strong></span>
+      <span>🍽 <strong>4–6 Personen</strong></span>
+      <span>⭐ <strong>Mittel</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">12</span> Lasagneblätter (kein Vorkochen)</li>
+          <li><span class="ing-amount">400 g</span> Hackfleischersatz (Soja/Linsen)</li>
+          <li><span class="ing-amount">500 ml</span> passierte Tomaten</li>
+          <li><span class="ing-amount">1</span> Zucchini, gewürfelt</li>
+          <li><span class="ing-amount">1</span> Aubergine, gewürfelt</li>
+          <li><span class="ing-amount">2</span> Karotten, fein gewürfelt</li>
+          <li><span class="ing-amount">1</span> Zwiebel, gehackt</li>
+          <li><span class="ing-amount">2</span> Knoblauchzehen</li>
+          <li><span class="ing-amount">125 g</span> Mozzarella, in Scheiben</li>
+          <li><span class="ing-amount">50 g</span> Parmesan, gerieben (optional)</li>
+          <li><span class="ing-amount"></span> Olivenöl, Salz, Pfeffer, Oregano, Basilikum</li>
+        </ul>
+        <div class="subsection">
+          <div class="subsection-label">— Béchamel —</div>
+          <ul>
+            <li><span class="ing-amount">500 ml</span> Milch</li>
+            <li><span class="ing-amount">40 g</span> Butter</li>
+            <li><span class="ing-amount">40 g</span> Mehl</li>
+            <li><span class="ing-amount"></span> Muskatnuss, Salz, Pfeffer</li>
+          </ul>
+        </div>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Ofen auf 190 °C Ober-/Unterhitze vorheizen.</li>
+          <li>Zwiebel und Knoblauch in Olivenöl anschwitzen. Karotten, Aubergine und Zucchini dazugeben, 5 Min. braten.</li>
+          <li>Hackfleischersatz unterrühren, passierte Tomaten dazu, mit Oregano, Basilikum, Salz und Pfeffer würzen – 10 Min. köcheln.</li>
+          <li>Béchamel: Butter schmelzen, Mehl einrühren, Milch nach und nach einrühren bis die Sauce glatt und cremig ist. Mit Salz, Pfeffer und Muskatnuss abschmecken.</li>
+          <li>Auflaufform einölen. Abwechselnd schichten: Béchamel → Nudelblätter → Tomatensoße → Béchamel → Nudelblätter … mit Béchamel abschließen.</li>
+          <li>Mozzarella und Parmesan oben drauf, 35–40 Min. backen bis die Oberfläche goldbraun blubbert.</li>
+          <li>10 Min. ruhen lassen vor dem Anschneiden – so hält die Lasagne besser zusammen.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Einen Tag vorher zubereitet schmeckt sie noch besser – einfach abgedeckt im Kühlschrank lassen und am nächsten Tag aufbacken.</div>
+  </article>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🍋 Zitronen-Zucchini-Pasta mit Feta</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">⚡ Schnell</span>
+        <span class="tag">☀️ Sommerlich</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>20 Min.</strong></span>
+      <span>🍽 <strong>2 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">300 g</span> Pasta (Spaghetti oder Linguine)</li>
+          <li><span class="ing-amount">2</span> Zucchini, dünne Scheiben</li>
+          <li><span class="ing-amount">1</span> Zwiebel, feine Ringe</li>
+          <li><span class="ing-amount">1</span> Bio-Zitrone – Saft &amp; Abrieb</li>
+          <li><span class="ing-amount">4 EL</span> Olivenöl (gutes!)</li>
+          <li><span class="ing-amount">150 g</span> Feta, zerbröckelt</li>
+          <li><span class="ing-amount">2</span> Knoblauchzehen</li>
+          <li><span class="ing-amount"></span> Salz, Pfeffer, frische Minze oder Basilikum</li>
+        </ul>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Pasta nach Packungsanweisung kochen – etwas Kochwasser auffangen!</li>
+          <li>Olivenöl in einer großen Pfanne erhitzen, Zwiebeln und Knoblauch bei mittlerer Hitze weich dünsten (~4 Min.).</li>
+          <li>Zucchini dazugeben, 3–4 Min. braten bis sie leicht Farbe bekommen.</li>
+          <li>Pasta direkt in die Pfanne, Zitronensaft und -abrieb dazu, mit einem Schuss Kochwasser alles cremig rühren.</li>
+          <li>Mit Salz und Pfeffer abschmecken, Feta darüberbröckeln, frische Kräuter drauf – fertig.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Der Zitronenabrieb ist das Geheimnis – unbedingt eine Bio-Zitrone verwenden. Wer mag: ein paar Chiliflocken für extra Kick.</div>
+  </article>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🧄 Spaghetti Aglio e Olio</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">⚡ Schnell</span>
+        <span class="tag">🇮🇹 Klassiker</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>20 Min.</strong></span>
+      <span>🍽 <strong>2 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">300 g</span> Spaghetti</li>
+          <li><span class="ing-amount">6 EL</span> gutes Olivenöl</li>
+          <li><span class="ing-amount">4–5</span> Knoblauchzehen, in dünne Scheiben</li>
+          <li><span class="ing-amount">1–2</span> Peperoncini, in Ringe (oder Chiliflocken)</li>
+          <li><span class="ing-amount">50 g</span> Parmesan, frisch gerieben <em>(Pflicht!)</em></li>
+          <li><span class="ing-amount"></span> Salz, frische Petersilie</li>
+          <li><span class="ing-amount"></span> Optional: 2 frische Tomaten, gewürfelt</li>
+        </ul>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Pasta in gut gesalzenem Wasser al dente kochen – etwas Kochwasser auffangen!</li>
+          <li>Olivenöl in einer großen Pfanne bei mittlerer Hitze erwärmen. Knoblauchscheiben dazugeben und langsam goldgelb ziehen lassen (~3 Min.) – nicht bräunen, sonst wird es bitter.</li>
+          <li>Peperoncini dazugeben, kurz mitschwenken.</li>
+          <li>Wer Tomaten mag: jetzt dazugeben und 2 Min. mitbraten.</li>
+          <li>Pasta direkt in die Pfanne, 2–3 EL Kochwasser dazu – alles bei hoher Hitze schwenken bis eine leicht cremige Emulsion entsteht.</li>
+          <li>Vom Herd nehmen, Petersilie unterrühren, großzügig Parmesan drüber – fertig.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Das Geheimnis liegt im Kochwasser – die Stärke darin bindet das Öl zu einer seidigen Sauce. Kein Kochwasser = trockene Pasta. Gutes Olivenöl macht hier den ganzen Unterschied.</div>
+  </article>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🍜 Pad Thai</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">🌏 Asiatisch</span>
+        <span class="tag">💪 Proteinreich</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>30 Min.</strong></span>
+      <span>🍽 <strong>2 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">200 g</span> Reisnudeln (flach, ~5 mm)</li>
+          <li><span class="ing-amount">200 g</span> Tofu, gewürfelt</li>
+          <li><span class="ing-amount">2</span> Eier</li>
+          <li><span class="ing-amount">3</span> Knoblauchzehen, gehackt</li>
+          <li><span class="ing-amount">3</span> Frühlingszwiebeln, in Ringe</li>
+          <li><span class="ing-amount">100 g</span> Sojasprossen</li>
+          <li><span class="ing-amount">2 EL</span> Erdnüsse, gehackt &amp; geröstet</li>
+          <li><span class="ing-amount">1</span> Limette</li>
+          <li><span class="ing-amount">2 EL</span> Sesamöl oder Erdnussöl</li>
+          <li><span class="ing-amount"></span> Chiliflocken, Koriander (optional)</li>
+        </ul>
+        <div class="subsection">
+          <div class="subsection-label">— Sauce —</div>
+          <ul>
+            <li><span class="ing-amount">3 EL</span> Tamarindenpaste</li>
+            <li><span class="ing-amount">2 EL</span> Sojasoße</li>
+            <li><span class="ing-amount">1 EL</span> brauner Zucker oder Palmzucker</li>
+          </ul>
+        </div>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Reisnudeln ~15 Min. in warmem Wasser einweichen, dann abgießen.</li>
+          <li>Tamarindenpaste, Sojasoße und Zucker zu einer Sauce verrühren.</li>
+          <li>Öl im Wok oder großer Pfanne erhitzen, Knoblauch kurz anbraten (1 Min.).</li>
+          <li>Tofu dazugeben und goldbraun braten (~5 Min.).</li>
+          <li>Nudeln in den Wok, Sauce drüber – bei hoher Hitze 2–3 Min. rühren.</li>
+          <li>Nudeln an den Rand schieben, Eier in der Mitte scramble, dann alles vermischen.</li>
+          <li>Sojasprossen und Frühlingszwiebeln unterheben, kurz mitschwenken.</li>
+          <li>Mit Erdnüssen, Limettensaft und Chiliflocken servieren.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">
+      💡 <strong>Tipp:</strong> Wer keinen Tofu mag, kann auch Garnelen oder gebratene Kichererbsen nehmen. Erdnüsse erst ganz am Ende drauf – so bleiben sie knusprig.
+      <br><br>
+      🌿 <strong>Was ist Tamarindenpaste?</strong> Sie wird aus der Frucht des Tamarindenbaums gewonnen und gibt dem Pad Thai seine typische süß-saure Note – unersetzlich für das Originalrezept. Sie ist reich an Eisen, Magnesium und Antioxidantien und unterstützt die Verdauung. Am besten im Asialaden kaufen, hält sich im Kühlschrank mehrere Monate.
+    </div>
+  </article>
+
+  <!-- ════════════════════════════════════════════
+       OFENGERICHTE
+  ════════════════════════════════════════════ -->
+  <h2 class="chapter-heading" id="ofen">🥘 Ofengerichte &amp; Eintöpfe</h2>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🥘 Gerösteter Blumenkohl mit Joghurt-Dip</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">🌍 International</span>
+        <span class="tag">🔥 Ofengericht</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>40 Min.</strong></span>
+      <span>🍽 <strong>2–3 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">1</span> Blumenkohl, in Röschen</li>
+          <li><span class="ing-amount">2 TL</span> Ras el Hanout</li>
+          <li><span class="ing-amount">3 EL</span> Olivenöl</li>
+          <li><span class="ing-amount">200 g</span> griechischer Joghurt</li>
+          <li><span class="ing-amount">1</span> Knoblauchzehe, gerieben</li>
+          <li><span class="ing-amount">½</span> Zitrone, Saft &amp; Abrieb</li>
+          <li><span class="ing-amount">2 EL</span> Granatapfelkerne (optional)</li>
+          <li><span class="ing-amount"></span> Salz, Pfeffer, frische Petersilie</li>
+        </ul>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Ofen auf 220 °C Umluft vorheizen.</li>
+          <li>Blumenkohlröschen mit Olivenöl, Ras el Hanout, Salz und Pfeffer mischen.</li>
+          <li>Auf einem Backblech verteilen, 25–30 Min. rösten bis die Ränder goldbraun sind.</li>
+          <li>Joghurt mit Knoblauch, Zitronensaft und Abrieb verrühren, mit Salz abschmecken.</li>
+          <li>Blumenkohl auf dem Joghurt anrichten, mit Granatapfelkernen und Petersilie garnieren.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Perfekt als Vorspeise oder mit Fladenbrot als Hauptgericht. Reste schmecken kalt als Bowl-Topping.</div>
+  </article>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🥦 Ofengemüse mit Reis &amp; Erdnusssoße</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegan</span>
+        <span class="tag">💪 Gesund</span>
+        <span class="tag">🥗 Meal Prep</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>40 Min.</strong></span>
+      <span>🍽 <strong>2 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">150 g</span> Basmati- oder Jasminreis</li>
+          <li><span class="ing-amount">1</span> Süßkartoffel, gewürfelt</li>
+          <li><span class="ing-amount">1</span> Paprika, in Streifen</li>
+          <li><span class="ing-amount">1</span> Zucchini, in Scheiben</li>
+          <li><span class="ing-amount">200 g</span> Brokkoliröschen</li>
+          <li><span class="ing-amount">2 EL</span> Olivenöl</li>
+          <li><span class="ing-amount"></span> Salz, Pfeffer, Paprikapulver, Kreuzkümmel</li>
+        </ul>
+        <div class="subsection">
+          <div class="subsection-label">— Erdnusssoße —</div>
+          <ul>
+            <li><span class="ing-amount">3 EL</span> Erdnussbutter (cremig)</li>
+            <li><span class="ing-amount">2 EL</span> Sojasoße</li>
+            <li><span class="ing-amount">1 EL</span> Limettensaft oder Reisessig</li>
+            <li><span class="ing-amount">1 TL</span> Ahornsirup oder Honig</li>
+            <li><span class="ing-amount">1</span> Knoblauchzehe, gerieben</li>
+            <li><span class="ing-amount">1 TL</span> Ingwer, gerieben (optional)</li>
+            <li><span class="ing-amount">3–4 EL</span> warmes Wasser zum Verdünnen</li>
+            <li><span class="ing-amount"></span> Optional: Chiliflocken, Sesamöl</li>
+          </ul>
+        </div>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Ofen auf 200 °C Umluft vorheizen. <em>(Heißluftfritteuse: 190 °C)</em></li>
+          <li>Gemüse mit Olivenöl, Salz, Pfeffer, Paprikapulver und Kreuzkümmel vermischen und auf einem Blech verteilen.</li>
+          <li>25–30 Min. rösten bis die Ränder leicht karamellisieren. <em>(Heißluftfritteuse: 15–20 Min., zwischendurch schütteln)</em></li>
+          <li>Reis nach Packungsanweisung kochen.</li>
+          <li>Alle Zutaten der Erdnusssoße verrühren und mit warmem Wasser auf die gewünschte Konsistenz bringen.</li>
+          <li>Reis in Schüsseln füllen, Gemüse drauf, Erdnusssoße großzügig drüber – fertig.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Die Erdnusssoße passt auch als Dip für Rohkost oder als Salat-Dressing. Gemüse nach Saison variieren – im Winter Kürbis &amp; Pastinaken, im Sommer Aubergine &amp; Kirschtomaten.</div>
+  </article>
+
+  <!-- ════════════════════════════════════════════
+       BURGER
+  ════════════════════════════════════════════ -->
+  <h2 class="chapter-heading" id="burger">🍔 Burger &amp; Snacks</h2>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🍔 Vegane Schwarzbohnen-Burger</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegan</span>
+        <span class="tag">💪 Proteinreich</span>
+        <span class="tag">🏠 Hausmannskost</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>35 Min.</strong></span>
+      <span>🍽 <strong>4 Burger</strong></span>
+      <span>⭐ <strong>Mittel</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">1 Dose</span> schwarze Bohnen (400 g), abgetropft</li>
+          <li><span class="ing-amount">80 g</span> Haferflocken</li>
+          <li><span class="ing-amount">1</span> Zwiebel, fein gewürfelt</li>
+          <li><span class="ing-amount">2</span> Knoblauchzehen, gepresst</li>
+          <li><span class="ing-amount">1 EL</span> Sojasoße</li>
+          <li><span class="ing-amount">1 TL</span> Paprikapulver (geräuchert)</li>
+          <li><span class="ing-amount">1 TL</span> Kreuzkümmel</li>
+          <li><span class="ing-amount"></span> Salz, Pfeffer, Olivenöl zum Braten</li>
+          <li><span class="ing-amount"></span> Optional: 100 g Pilze, fein gewürfelt</li>
+        </ul>
+        <div class="subsection">
+          <div class="subsection-label">— Burger zusammenstellen —</div>
+          <ul>
+            <li><span class="ing-amount">4</span> Burgerbrötchen, getoastet</li>
+            <li><span class="ing-amount">2</span> Tomaten, in Scheiben</li>
+            <li><span class="ing-amount"></span> Rucola oder Salat</li>
+            <li><span class="ing-amount"></span> Rote Zwiebel, in Ringe</li>
+            <li><span class="ing-amount"></span> Käse (optional, dann nicht mehr vegan)</li>
+            <li><span class="ing-amount"></span> Mayo, BBQ-Soße oder Burger-Soße</li>
+          </ul>
+        </div>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Schwarze Bohnen gut abtropfen und mit einer Gabel grob zerdrücken – Textur soll bleiben, nicht zu fein.</li>
+          <li>Zwiebel und Knoblauch fein hacken. Pilze (falls verwendet) klein würfeln und in etwas Öl anbraten bis sie ihr Wasser verloren haben.</li>
+          <li>Bohnen, Haferflocken, Zwiebel, Knoblauch, Sojasoße und Gewürze vermengen. 10 Min. ruhen lassen damit die Haferflocken quellen und die Masse bindiger wird.</li>
+          <li>Mit nassen Händen 4 Patties formen.</li>
+          <li>In Olivenöl bei mittlerer-hoher Hitze je 4–5 Min. pro Seite braten bis sie eine knusprige, dunkle Kruste haben.</li>
+          <li>Brötchen toasten, Soße drauf, Patty rein, nach Belieben belegen – fertig.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Rohe Patties lassen sich super einfrieren – einfach zwischen Backpapier schichten. Gefroren direkt in die Pfanne, kein Auftauen nötig.</div>
+  </article>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🌯 Wraps mit Soja-Geschnetzeltem</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch</span>
+        <span class="tag">⚡ Schnell</span>
+        <span class="tag">🥗 Meal Prep</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>30 Min.</strong></span>
+      <span>🍽 <strong>2–3 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">4</span> Wrap-Tortillas (Weizen oder Vollkorn)</li>
+          <li><span class="ing-amount">200 g</span> Soja-Geschnetzeltes oder Hackfleischersatz</li>
+          <li><span class="ing-amount">1</span> Paprika, in Streifen</li>
+          <li><span class="ing-amount">100 g</span> Brokkoliröschen</li>
+          <li><span class="ing-amount">1 Dose</span> Mais, abgetropft</li>
+          <li><span class="ing-amount"></span> Eisbergsalat oder Romanasalat, in Streifen</li>
+          <li><span class="ing-amount">2</span> Tomaten, gewürfelt</li>
+          <li><span class="ing-amount">½</span> Gurke, gewürfelt</li>
+          <li><span class="ing-amount"></span> Olivenöl, Paprikapulver, Salz, Pfeffer</li>
+        </ul>
+        <div class="subsection">
+          <div class="subsection-label">— Schmand-Tomaten-Sauce —</div>
+          <ul>
+            <li><span class="ing-amount">150 g</span> Schmand</li>
+            <li><span class="ing-amount">2 EL</span> Tomatenmark</li>
+            <li><span class="ing-amount">1</span> Knoblauchzehe, gerieben</li>
+            <li><span class="ing-amount">1 TL</span> Paprikapulver (geräuchert)</li>
+            <li><span class="ing-amount"></span> Salz, Spritzer Zitronensaft</li>
+            <li><span class="ing-amount"></span> Optional: Chiliflocken</li>
+          </ul>
+        </div>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Soja-Geschnetzeltes nach Packungsanweisung einweichen, gut ausdrücken, mit Paprikapulver, Salz und Pfeffer würzen.</li>
+          <li>Öl in der Pfanne erhitzen, Geschnetzeltes scharf anbraten bis es knusprig ist (~5 Min.). Paprika und Brokkoli dazugeben, weitere 3 Min. mitbraten.</li>
+          <li>Schmand mit Tomatenmark, Knoblauch, Paprikapulver, Salz und Zitronensaft glatt verrühren.</li>
+          <li>Tortillas kurz in der trockenen Pfanne oder Mikrowelle anwärmen.</li>
+          <li>Sauce großzügig auf dem Wrap verstreichen.</li>
+          <li>Gebratenes Geschnetzeltes und Gemüse drauf, dann frische Zutaten: Salat, Tomaten, Gurke, Mais.</li>
+          <li>Wrap fest einrollen, diagonal halbieren – fertig.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Die Schmand-Sauce ist das Herzstück – sie verbindet alles. Füllung und Frischzutaten getrennt aufbewahren und erst beim Essen einrollen, dann wird der Wrap nicht matschig. Reste der Füllung schmecken am nächsten Tag kalt als Salat-Topping.</div>
+  </article>
+
+  <!-- ════════════════════════════════════════════
+       SUPPEN & EINTÖPFE
+  ════════════════════════════════════════════ -->
+  <h2 class="chapter-heading" id="suppen">🫘 Suppen &amp; Eintöpfe</h2>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🌶️ Chili con Carne</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegetarisch möglich</span>
+        <span class="tag">💛 Seelenfutter</span>
+        <span class="tag">🥗 Meal Prep</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>40 Min.</strong></span>
+      <span>🍽 <strong>4 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">2 Dosen</span> Kidneybohnen (à 400 g), abgetropft</li>
+          <li><span class="ing-amount">1 Dose</span> gehackte Tomaten (400 g)</li>
+          <li><span class="ing-amount">1 Dose</span> Mais, abgetropft</li>
+          <li><span class="ing-amount">300 g</span> Hackfleischersatz oder Rinderhack</li>
+          <li><span class="ing-amount">2</span> Zwiebeln, gewürfelt</li>
+          <li><span class="ing-amount">3</span> Knoblauchzehen, gehackt</li>
+          <li><span class="ing-amount">1</span> rote Paprika, gewürfelt</li>
+          <li><span class="ing-amount">200 ml</span> Gemüsebrühe</li>
+          <li><span class="ing-amount">2 TL</span> Kreuzkümmel</li>
+          <li><span class="ing-amount">2 TL</span> Paprikapulver (geräuchert)</li>
+          <li><span class="ing-amount">1 TL</span> Chiliflocken (mehr nach Geschmack)</li>
+          <li><span class="ing-amount">1 TL</span> Oregano</li>
+          <li><span class="ing-amount">1 TL</span> Kakaopulver (Geheimzutat!)</li>
+          <li><span class="ing-amount"></span> Olivenöl, Salz, Pfeffer</li>
+        </ul>
+        <div class="subsection">
+          <div class="subsection-label">— Zum Servieren —</div>
+          <ul>
+            <li><span class="ing-amount"></span> Baguette oder Reis</li>
+            <li><span class="ing-amount"></span> Saure Sahne oder Joghurt</li>
+            <li><span class="ing-amount"></span> Geriebener Cheddar oder Gouda</li>
+            <li><span class="ing-amount"></span> Frische Petersilie oder Koriander</li>
+          </ul>
+        </div>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Zwiebeln und Knoblauch in Olivenöl bei mittlerer Hitze anbraten (~3 Min.).</li>
+          <li>Paprika dazugeben, weitere 3 Min. mitbraten.</li>
+          <li>Hackfleisch oder -ersatz hinzufügen und krümelig anbraten bis es Farbe bekommt.</li>
+          <li>Alle Gewürze einrühren und 1 Min. rösten bis es duftet.</li>
+          <li>Tomaten, Bohnen, Mais und Brühe dazugeben, alles gut verrühren.</li>
+          <li>Bei mittlerer Hitze 20–25 Min. köcheln lassen bis das Chili schön dicklich wird.</li>
+          <li>Mit Salz, Pfeffer und Chili abschmecken – mit Baguette oder Reis servieren.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Das Kakaopulver klingt ungewöhnlich, rundet das Chili aber unglaublich ab – einfach ausprobieren! Einen Tag später schmeckt es noch besser, perfekt zum Vorkochen und Einfrieren.</div>
+  </article>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🫘 Roter Linsendahl mit Joghurt &amp; eingelegten Zwiebeln</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegan</span>
+        <span class="tag">⚡ Schnell</span>
+        <span class="tag">💛 Seelenfutter</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>25 Min.</strong></span>
+      <span>🍽 <strong>3–4 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">250 g</span> rote Linsen</li>
+          <li><span class="ing-amount">1</span> Zwiebel, gewürfelt</li>
+          <li><span class="ing-amount">3</span> Knoblauchzehen</li>
+          <li><span class="ing-amount">1 EL</span> frischer Ingwer, gerieben</li>
+          <li><span class="ing-amount">1 Dose</span> Kokosmilch (400 ml)</li>
+          <li><span class="ing-amount">400 ml</span> Gemüsebrühe</li>
+          <li><span class="ing-amount">1 TL</span> Kurkuma</li>
+          <li><span class="ing-amount">1 TL</span> Kreuzkümmel</li>
+          <li><span class="ing-amount">1 TL</span> Garam Masala</li>
+          <li><span class="ing-amount"></span> Olivenöl, Salz, Pfeffer, Chili</li>
+        </ul>
+        <div class="subsection">
+          <div class="subsection-label">— Topping —</div>
+          <ul>
+            <li><span class="ing-amount">200 g</span> griechischer Joghurt</li>
+            <li><span class="ing-amount">1</span> rote Zwiebel, dünne Ringe</li>
+            <li><span class="ing-amount">1</span> Limette oder Zitrone, Saft</li>
+            <li><span class="ing-amount">1 Prise</span> Salz &amp; Zucker zum Einlegen</li>
+          </ul>
+        </div>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Rote Zwiebel in dünne Ringe schneiden, mit Limettensaft, Salz und einer Prise Zucker mischen – mindestens 15 Min. ziehen lassen.</li>
+          <li>Zwiebel und Knoblauch in Olivenöl anschwitzen, Ingwer dazu, 2 Min. braten.</li>
+          <li>Gewürze (Kurkuma, Kreuzkümmel, Garam Masala) einrühren, kurz rösten bis es duftet.</li>
+          <li>Linsen, Kokosmilch und Brühe dazugeben – bei mittlerer Hitze 15–18 Min. köcheln bis die Linsen zerfallen und cremig sind.</li>
+          <li>Mit Salz, Pfeffer und Chili abschmecken. In Schüsseln füllen, Joghurt und eingelegte Zwiebeln obendrauf.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Die eingelegten Zwiebeln machen den Unterschied – am besten schon morgens vorbereiten. Mit Fladenbrot oder Reis servieren.</div>
+  </article>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🎃 Kürbissuppe mit Ingwer &amp; Kokosmilch</h2>
+      <div class="tags">
+        <span class="tag">🌱 Vegan</span>
+        <span class="tag">🍂 Herbstlich</span>
+        <span class="tag">💛 Seelenfutter</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>35 Min.</strong></span>
+      <span>🍽 <strong>4 Personen</strong></span>
+      <span>⭐ <strong>Einfach</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">1 kg</span> Hokkaido-Kürbis (oder Butternut), gewürfelt</li>
+          <li><span class="ing-amount">1</span> Zwiebel, gewürfelt</li>
+          <li><span class="ing-amount">2</span> Knoblauchzehen</li>
+          <li><span class="ing-amount">2 EL</span> frischer Ingwer, gerieben</li>
+          <li><span class="ing-amount">1 Dose</span> Kokosmilch (400 ml)</li>
+          <li><span class="ing-amount">600 ml</span> Gemüsebrühe</li>
+          <li><span class="ing-amount">1 TL</span> Kurkuma</li>
+          <li><span class="ing-amount">½ TL</span> Cayennepfeffer (nach Geschmack)</li>
+          <li><span class="ing-amount"></span> Olivenöl, Salz, Pfeffer</li>
+          <li><span class="ing-amount"></span> Optional: Kürbiskerne, Kürbiskernöl zum Garnieren</li>
+        </ul>
+        <div style="margin-top:1rem; padding: 0.75rem 1rem; background: #FEF3C7; border-left: 3px solid #F59E0B; border-radius: 0.5rem; font-size: 0.85rem;">
+          🔧 <strong>Benötigt:</strong> Stabmixer oder Standmixer
+        </div>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Zwiebel und Knoblauch in Olivenöl bei mittlerer Hitze weich dünsten (~4 Min.).</li>
+          <li>Ingwer und Kurkuma dazugeben, kurz mitrösten bis es duftet (~1 Min.).</li>
+          <li>Kürbiswürfel dazugeben, Gemüsebrühe aufgießen – 20 Min. köcheln bis der Kürbis weich ist.</li>
+          <li>Kokosmilch einrühren, dann alles mit dem Stabmixer cremig pürieren.</li>
+          <li>Mit Salz, Pfeffer und Cayennepfeffer abschmecken.</li>
+          <li>In Schüsseln füllen und nach Belieben mit Kürbiskernen und einem Schuss Kürbiskernöl garnieren.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Hokkaido muss nicht geschält werden – die Schale wird beim Kochen weich und wird mitpüriert. Spart Zeit und ist nachhaltiger.</div>
+  </article>
+
+  <!-- ════════════════════════════════════════════
+       SÜSSES & DESSERTS
+  ════════════════════════════════════════════ -->
+  <h2 class="chapter-heading" id="suesses">🍰 Süßes &amp; Desserts</h2>
+
+  <article class="recipe">
+    <div class="recipe-header">
+      <h2>🍰 Tiramisu</h2>
+      <div class="tags">
+        <span class="tag">🍰 Dessert</span>
+        <span class="tag">🇮🇹 Klassiker</span>
+        <span class="tag">❤️ Familienlieblings</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span>⏱ <strong>30 Min. + 4 Std. kühlen</strong></span>
+      <span>🍽 <strong>6–8 Personen</strong></span>
+      <span>⭐ <strong>Mittel</strong></span>
+    </div>
+    <div class="recipe-body">
+      <div class="ingredients">
+        <h3>Zutaten</h3>
+        <ul>
+          <li><span class="ing-amount">500 g</span> Mascarpone</li>
+          <li><span class="ing-amount">4</span> Eier, getrennt</li>
+          <li><span class="ing-amount">80 g</span> Zucker</li>
+          <li><span class="ing-amount">200 ml</span> starker Espresso, abgekühlt</li>
+          <li><span class="ing-amount">3 EL</span> Amaretto oder Marsala (optional)</li>
+          <li><span class="ing-amount">200 g</span> Löffelbiskuits</li>
+          <li><span class="ing-amount"></span> Kakao zum Bestäuben</li>
+        </ul>
+      </div>
+      <div class="steps">
+        <h3>Zubereitung</h3>
+        <ol>
+          <li>Espresso kochen, Amaretto einrühren, abkühlen lassen.</li>
+          <li>Eigelb mit Zucker cremig aufschlagen bis die Masse hell und dicklich ist (~5 Min.).</li>
+          <li>Mascarpone unter die Eigelbcreme rühren bis alles glatt ist.</li>
+          <li>Eiweiß steif schlagen und vorsichtig in zwei Portionen unterheben – die Creme bleibt so luftig.</li>
+          <li>Löffelbiskuits kurz (!) in den Espresso tauchen – nur 1–2 Sekunden, sonst werden sie matschig.</li>
+          <li>Abwechselnd schichten: Biskuits → Creme → Biskuits → Creme. Mit Creme abschließen.</li>
+          <li>Mindestens 4 Stunden (besser über Nacht) kühlen. Vor dem Servieren großzügig Kakao drübersieben.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="tip">💡 <strong>Tipp:</strong> Am nächsten Tag noch besser – am Abend vorher machen und über Nacht durchziehen lassen.</div>
+  </article>
+
+  <!-- ════════════════════════════════════════════
+       BROTZEIT
+  ════════════════════════════════════════════ -->
+  <h2 class="chapter-heading" id="brotzeit">🍞 Brotzeit</h2>
+  <p style="color:var(--text-light); margin-bottom:1.2rem; font-size:0.95rem;">
+    Manchmal ist das Beste am Tag eine gute Scheibe Brot. Hier sind unsere liebsten Kombinationen – von herzhaft bis süß.
+  </p>
+
+  <div class="brotzeit-grid">
+
+    <div class="brotzeit-card">
+      <h3>🧀 Käse &amp; Tomate</h3>
+      <ul>
+        <li>Scheibe Käse (z.B. Gouda oder Bergkäse)</li>
+        <li>Frische Tomate in Scheiben</li>
+        <li>Etwas Butter</li>
+        <li>Pfeffer drüber – fertig</li>
+      </ul>
+    </div>
+
+    <div class="brotzeit-card">
+      <h3>🥒 Gurke &amp; Butter</h3>
+      <ul>
+        <li>Frische Butter</li>
+        <li>Gurke in dünnen Scheiben</li>
+        <li>Salz &amp; Pfeffer</li>
+        <li>Optional: frischer Dill</li>
+      </ul>
+    </div>
+
+    <div class="brotzeit-card">
+      <h3>🪴 Olivenöl &amp; Tomate</h3>
+      <ul>
+        <li>Gutes Olivenöl draufträufeln</li>
+        <li>Frische Tomate</li>
+        <li>Fleur de sel &amp; Pfeffer</li>
+        <li>Optional: frisches Basilikum</li>
+      </ul>
+    </div>
+
+    <div class="brotzeit-card">
+      <h3>🧆 Hummus</h3>
+      <ul>
+        <li>1 Dose Kichererbsen (400 g)</li>
+        <li>Tahini, Knoblauch, Zitronensaft</li>
+        <li>Olivenöl, Kreuzkümmel, Salz</li>
+        <li>Pürieren – mit Paprikapulver toppen</li>
+      </ul>
+    </div>
+
+    <div class="brotzeit-card">
+      <h3>🍳 Spiegelei oder Rührer</h3>
+      <ul>
+        <li>Ei(er) in Butter braten</li>
+        <li>Rührer: Paprika &amp; Zwiebeln mit anbraten</li>
+        <li>Salz &amp; Pfeffer</li>
+        <li>Auf Sauerteig oder Toastbrot</li>
+      </ul>
+    </div>
+
+    <div class="brotzeit-card">
+      <h3>🐟 Räucherlachs</h3>
+      <ul>
+        <li>Frischkäse oder Butter als Basis</li>
+        <li>Räucherlachs drauflegen</li>
+        <li>Zitronensaft &amp; Kapern</li>
+        <li>Optional: rote Zwiebel, Dill</li>
+      </ul>
+    </div>
+
+    <div class="brotzeit-card">
+      <h3>🐠 Matjes</h3>
+      <ul>
+        <li>Butter auf frisches Graubrot</li>
+        <li>Matjesfilet drauflegen</li>
+        <li>Frische Zwiebeln &amp; Gurke</li>
+        <li>Optional: Apfelscheibe als Frische-Kick</li>
+      </ul>
+    </div>
+
+    <div class="brotzeit-card">
+      <h3>🍫 Haselnusscreme</h3>
+      <ul>
+        <li>Großzügig Nusscreme drauf</li>
+        <li>Lieblingsmarke: Viba</li>
+        <li>Optional: Bananenscheiben</li>
+        <li>Oder: selbstgemachte Nusscreme</li>
+      </ul>
+    </div>
+
+    <!-- NEU: Frischkäse -->
+    <div class="brotzeit-card" style="border-color: var(--green-main); border-width: 2px;">
+      <h3>🧀 Frischkäse &amp; Kräuter <span style="font-size:0.7rem; color:var(--green-main); font-weight:normal;">neu</span></h3>
+      <ul>
+        <li>Frischkäse großzügig aufstreichen</li>
+        <li>Schnittlauch oder Dill, frisch gehackt</li>
+        <li>Radieschen in Scheiben</li>
+        <li>Salz &amp; Pfeffer</li>
+        <li>Optional: Gurke oder Tomate dazu</li>
+      </ul>
+    </div>
+
+    <!-- NEU: Avocado -->
+    <div class="brotzeit-card" style="border-color: var(--green-main); border-width: 2px;">
+      <h3>🥑 Avocado <span style="font-size:0.7rem; color:var(--green-main); font-weight:normal;">neu</span></h3>
+      <ul>
+        <li>Reife Avocado zerdrücken</li>
+        <li>Zitronensaft, Salz &amp; Pfeffer</li>
+        <li>Chiliflocken für extra Kick</li>
+        <li>Optional: Sesam oder Ei obendrauf</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- SHOPPING LIST -->
+  <div class="shopping-list">
+    <div class="shopping-list-header">🛒 Einkaufsliste – Brotzeit</div>
+
+    <div class="shopping-row">
+      <div class="shopping-cat">🍞 Brot</div>
+      <div class="shopping-items">Sauerteigbrot, Toastbrot, Graubrot / Vollkornbrot</div>
+    </div>
+    <div class="shopping-row">
+      <div class="shopping-cat">🧈 Aufstriche</div>
+      <div class="shopping-items">Butter, Frischkäse, Hummus, Olivenöl, Haselnusscreme</div>
+    </div>
+    <div class="shopping-row">
+      <div class="shopping-cat">🧀 Käse</div>
+      <div class="shopping-items">Gouda, Bergkäse</div>
+    </div>
+    <div class="shopping-row">
+      <div class="shopping-cat">🐟 Fisch</div>
+      <div class="shopping-items">Räucherlachs, Matjesfilet</div>
+    </div>
+    <div class="shopping-row">
+      <div class="shopping-cat">🥦 Gemüse &amp; Obst</div>
+      <div class="shopping-items">Tomaten, Gurke, Paprika, Zwiebeln (weiß &amp; rot), Radieschen, Avocado, Apfel</div>
+    </div>
+    <div class="shopping-row">
+      <div class="shopping-cat">🥚 Ei</div>
+      <div class="shopping-items">Eier</div>
+    </div>
+    <div class="shopping-row">
+      <div class="shopping-cat">🌿 Kräuter</div>
+      <div class="shopping-items">Dill, Schnittlauch, Basilikum, Petersilie</div>
+    </div>
+    <div class="shopping-row">
+      <div class="shopping-cat">🧂 Würzen</div>
+      <div class="shopping-items">Salz, Pfeffer, Fleur de sel, Zitrone, Kapern</div>
+    </div>
+    <div class="shopping-row">
+      <div class="shopping-cat">🏪 Vorrat</div>
+      <div class="shopping-items">Kichererbsen (Dose), Tahini, Knoblauch, Kreuzkümmel, Paprikapulver</div>
+    </div>
+    <div class="shopping-row">
+      <div class="shopping-cat">✨ Optional</div>
+      <div class="shopping-items">Honig, Bananenscheiben, Sesam, Chiliflocken</div>
+    </div>
+
+    <div class="shopping-note">
+      Avocado und Radieschen sind zusätzliche Empfehlungen für eine abwechslungsreiche Brotzeit.
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>
