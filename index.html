@@ -1514,7 +1514,7 @@ categories.forEach(cat => {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = '#' + id;
-        a.textContent = title.textContent.trim();
+        a.textContent = title.textContent.trim().replace(/\p{Extended_Pictographic}/gu, '').trim();
         li.appendChild(a);
         ul.appendChild(li);
       }
