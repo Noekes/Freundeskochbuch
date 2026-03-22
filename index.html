@@ -452,6 +452,94 @@
     font-weight: 600;
     font-size: 0.95rem;
   }
+
+  /* ── SCHRITT-FÜR-SCHRITT MODAL ── */
+  .step-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1rem;
+  }
+  .step-modal {
+    background: white;
+    border-radius: 1.2rem;
+    max-width: 540px; width: 100%;
+    max-height: 88vh; overflow-y: auto;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .step-modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: #F3F4F6; border: none;
+    border-radius: 50%; width: 2rem; height: 2rem;
+    cursor: pointer; font-size: 0.9rem; color: #6B7280;
+    line-height: 1;
+  }
+  .step-modal-close:hover { background: #E5E7EB; }
+  .step-modal-title {
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--green-dark); margin-bottom: 0.6rem;
+    padding-right: 2rem; line-height: 1.4;
+  }
+  .step-modal-phase {
+    font-size: 0.82rem; color: var(--text-light);
+    margin-bottom: 0.4rem;
+  }
+  .step-modal-progress {
+    background: #E5E7EB; border-radius: 999px;
+    height: 6px; margin-bottom: 1.5rem; overflow: hidden;
+  }
+  .step-modal-bar {
+    height: 100%; background: var(--green-main);
+    border-radius: 999px; transition: width 0.35s ease;
+  }
+  .step-text {
+    font-size: 1.05rem; line-height: 1.75;
+    color: var(--text); margin: 0;
+  }
+  .step-ingredients-list {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.35rem;
+  }
+  .step-ingredients-list li {
+    padding: 0.45rem 0.75rem;
+    background: var(--green-light);
+    border-radius: 0.4rem; font-size: 0.9rem;
+  }
+  .step-subsection-label {
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--text-light); margin: 0.75rem 0 0.3rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .step-modal-nav {
+    display: flex; justify-content: space-between;
+    margin-top: 2rem; gap: 1rem;
+  }
+  .step-btn-prev, .step-btn-next {
+    flex: 1; padding: 0.7rem 1rem;
+    border: none; border-radius: 0.6rem;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .step-btn-prev { background: #F3F4F6; color: var(--text); }
+  .step-btn-prev:hover { background: #E5E7EB; }
+  .step-btn-next { background: var(--green-main); color: white; }
+  .step-btn-next:hover { background: var(--green-dark); }
+  .btn-step-by-step {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    margin-top: 0.5rem;
+    background: var(--green-light); color: var(--green-dark);
+    border: 1px solid var(--green-border);
+    border-radius: 0.5rem; padding: 0.4rem 0.85rem;
+    font-size: 0.82rem; font-weight: 600; cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-step-by-step:hover {
+    background: var(--green-main); color: white;
+    border-color: var(--green-main);
+  }
 </style>
 </head>
 <body>
@@ -1903,6 +1991,115 @@ if (rezeptForm) {
     }
   });
 }
+
+// ── SCHRITT-FÜR-SCHRITT MODAL ──
+const stepModal = document.createElement('div');
+stepModal.className = 'step-modal-overlay';
+stepModal.style.display = 'none';
+stepModal.innerHTML = `
+  <div class="step-modal">
+    <button class="step-modal-close">✕</button>
+    <div class="step-modal-title"></div>
+    <div class="step-modal-phase"></div>
+    <div class="step-modal-progress"><div class="step-modal-bar"></div></div>
+    <div class="step-modal-content"></div>
+    <div class="step-modal-nav">
+      <button class="step-btn-prev">← Zurück</button>
+      <button class="step-btn-next">Weiter →</button>
+    </div>
+  </div>`;
+document.body.appendChild(stepModal);
+
+let stepData = [], currentStep = 0;
+
+function buildStepData(recipe) {
+  const steps = [];
+  // Zutaten sammeln
+  const groups = [];
+  recipe.querySelectorAll('.ingredients > ul').forEach(ul => {
+    const items = Array.from(ul.querySelectorAll('li')).map(li => li.textContent.trim()).filter(Boolean);
+    if (items.length) groups.push({ label: null, items });
+  });
+  recipe.querySelectorAll('.ingredients .subsection').forEach(sub => {
+    const label = sub.querySelector('.subsection-label')?.textContent.trim() || '';
+    const items = Array.from(sub.querySelectorAll('li')).map(li => li.textContent.trim()).filter(Boolean);
+    if (items.length) groups.push({ label, items });
+  });
+  if (groups.length) steps.push({ type: 'zutaten', groups });
+  // Zubereitungsschritte
+  recipe.querySelectorAll('.steps ol li').forEach((li, i) => {
+    steps.push({ type: 'step', text: li.textContent.trim(), index: i + 1 });
+  });
+  return steps;
+}
+
+function renderStep() {
+  const s = stepData[currentStep];
+  const isLast = currentStep === stepData.length - 1;
+  const bar = stepModal.querySelector('.step-modal-bar');
+  const phase = stepModal.querySelector('.step-modal-phase');
+  const content = stepModal.querySelector('.step-modal-content');
+  const prevBtn = stepModal.querySelector('.step-btn-prev');
+  const nextBtn = stepModal.querySelector('.step-btn-next');
+
+  bar.style.width = (stepData.length > 1 ? currentStep / (stepData.length - 1) * 100 : 100) + '%';
+  prevBtn.style.visibility = currentStep === 0 ? 'hidden' : 'visible';
+  nextBtn.textContent = isLast ? '✓ Fertig!' : 'Weiter →';
+
+  if (s.type === 'zutaten') {
+    phase.textContent = '📋 Zutaten – Überblick';
+    content.innerHTML = s.groups.map(g =>
+      (g.label ? `<div class="step-subsection-label">${g.label}</div>` : '') +
+      `<ul class="step-ingredients-list">${g.items.map(i => `<li>${i}</li>`).join('')}</ul>`
+    ).join('');
+  } else {
+    const total = stepData.filter(x => x.type === 'step').length;
+    phase.innerHTML = `Schritt <strong>${s.index}</strong> von ${total}`;
+    content.innerHTML = `<p class="step-text">${s.text}</p>`;
+  }
+}
+
+function closeStepModal() {
+  stepModal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+stepModal.querySelector('.step-btn-prev').addEventListener('click', () => {
+  if (currentStep > 0) { currentStep--; renderStep(); }
+});
+stepModal.querySelector('.step-btn-next').addEventListener('click', () => {
+  if (currentStep < stepData.length - 1) { currentStep++; renderStep(); }
+  else closeStepModal();
+});
+stepModal.querySelector('.step-modal-close').addEventListener('click', closeStepModal);
+stepModal.addEventListener('click', e => { if (e.target === stepModal) closeStepModal(); });
+document.addEventListener('keydown', e => {
+  if (stepModal.style.display === 'none') return;
+  if (e.key === 'ArrowRight' || e.key === 'Enter') stepModal.querySelector('.step-btn-next').click();
+  if (e.key === 'ArrowLeft') stepModal.querySelector('.step-btn-prev').click();
+  if (e.key === 'Escape') closeStepModal();
+});
+
+// Button zu jedem Rezept mit Schritten hinzufügen
+document.querySelectorAll('article.recipe').forEach(recipe => {
+  if (!recipe.querySelector('.steps ol')) return;
+  const btn = document.createElement('button');
+  btn.className = 'btn-step-by-step';
+  btn.innerHTML = '▶ Schritt für Schritt';
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    stepData = buildStepData(recipe);
+    if (!stepData.length) return;
+    currentStep = 0;
+    stepModal.querySelector('.step-modal-title').textContent =
+      recipe.querySelector('.recipe-header h2')?.textContent || '';
+    renderStep();
+    stepModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  });
+  const toggle = recipe.querySelector('.recipe-toggle');
+  if (toggle) toggle.appendChild(btn);
+});
 </script>
 
 </body>
